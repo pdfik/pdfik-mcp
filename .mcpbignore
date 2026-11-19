@@ -1,0 +1,8 @@
+src/
+tests/
+plugin/
+cursor/
+.claude-plugin/
+.github/
+tsconfig.json
+*.test.*

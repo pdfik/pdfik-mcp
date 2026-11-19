@@ -1,0 +1,105 @@
+# Release of an ALREADY PUBLISHED @pdfik/mcp version (npm is published by the owner,
+# locally): pack that exact npm package into an .mcpb for Claude Desktop, attach it to a
+# GitHub Release with its checksum, and write the entry in the official MCP Registry via
+# GitHub OIDC (no stored token). workflow_dispatch = dry run: everything but the Release
+# and the registry write.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Published npm version to dry-run (e.g. 0.1.0)'
+        required: true
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve the version
+        id: v
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then V="${GITHUB_REF_NAME#v}"; DRY=0; else V="$INPUT_VERSION"; DRY=1; fi
+          echo "$V" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo "bad version: $V"; exit 1; }
+          [ "$(jq -r .version package.json)" = "$V" ] || { echo "package.json is not $V"; exit 1; }
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "dry=$DRY" >> "$GITHUB_OUTPUT"
+
+      - name: Refuse a release that already exists
+        if: steps.v.outputs.dry == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v${{ steps.v.outputs.version }}" >/dev/null 2>&1; then
+            echo "Release v${{ steps.v.outputs.version }} already exists"; exit 1
+          fi
+
+      - name: Unpack the published npm package
+        run: |
+          mkdir -p build && cd build
+          npm pack "@pdfik/mcp@${{ steps.v.outputs.version }}"
+          tar -xzf pdfik-mcp-${{ steps.v.outputs.version }}.tgz
+          cd package
+          # The mirror's committed lockfile (the versions the gate tested), not a fresh resolve.
+          cp ../../package-lock.json .
+          npm ci --omit=dev --ignore-scripts
+          cp ../../manifest.json ../../icon.png .
+
+      - name: Pack the .mcpb
+        run: |
+          cd build/package
+          npx --yes @anthropic-ai/mcpb@2.1.2 validate manifest.json
+          npx --yes @anthropic-ai/mcpb@2.1.2 pack . "../pdfik-mcp-${{ steps.v.outputs.version }}.mcpb"
+          cd ..
+          sha256sum "pdfik-mcp-${{ steps.v.outputs.version }}.mcpb" | tee "pdfik-mcp-${{ steps.v.outputs.version }}.mcpb.sha256"
+
+      - name: Write the file URL and checksum into server.json
+        run: |
+          SHA=$(cut -d' ' -f1 "build/pdfik-mcp-${{ steps.v.outputs.version }}.mcpb.sha256")
+          URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/v${{ steps.v.outputs.version }}/pdfik-mcp-${{ steps.v.outputs.version }}.mcpb"
+          jq --arg v "${{ steps.v.outputs.version }}" --arg sha "$SHA" --arg url "$URL" '
+            .version = $v
+            | .packages |= map(.version = $v
+              | if .registryType == "mcpb" then .identifier = $url | .fileSha256 = $sha else . end)
+          ' server.json > build/server.json
+          cat build/server.json
+
+      - name: Install mcp-publisher
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/v1.8.9/mcp-publisher_linux_amd64.tar.gz" | tar -xz mcp-publisher
+          ./mcp-publisher --help >/dev/null
+
+      - name: Validate the registry entry
+        run: |
+          cp build/server.json server.json
+          ./mcp-publisher validate
+
+      - name: GitHub Release
+        if: steps.v.outputs.dry == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.v.outputs.version }}" \
+            "build/pdfik-mcp-${{ steps.v.outputs.version }}.mcpb" \
+            "build/pdfik-mcp-${{ steps.v.outputs.version }}.mcpb.sha256" \
+            --title "v${{ steps.v.outputs.version }}" --notes-file CHANGELOG.md
+
+      - name: Publish to the MCP Registry (GitHub OIDC)
+        if: steps.v.outputs.dry == '0'
+        run: |
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.pdfik/pdfik-mcp",
+  "title": "PDFik",
+  "description": "URL/HTML/Markdown to PDF, screenshots and Factur-X e-invoices via the PDFik API.",
+  "websiteUrl": "https://docs.pdfik.net/integrations/mcp",
+  "repository": {
+    "url": "https://github.com/pdfik/pdfik-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@pdfik/mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "PDFIK_API_KEY",
+          "description": "PDFik API key (create one at https://pdfik.net/dashboard/api-keys)",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "PDFIK_OUTPUT_DIR",
+          "description": "Folder for saved files (default ~/Downloads/PDFik)",
+          "isRequired": false,
+          "format": "string"
+        },
+        {
+          "name": "PDFIK_TEST_MODE",
+          "description": "Set to 1 for free test jobs with sample output",
+          "isRequired": false,
+          "format": "string"
+        }
+      ]
+    },
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/pdfik/pdfik-mcp/releases/download/v0.1.0/pdfik-mcp-0.1.0.mcpb",
+      "version": "0.1.0",
+      "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

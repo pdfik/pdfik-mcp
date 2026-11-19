@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "pdfik": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@pdfik/mcp@0.1.0"
+      ],
+      "env": {
+        "PDFIK_API_KEY": "${env:PDFIK_API_KEY}"
+      }
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "manifest_version": "0.3",
+  "name": "pdfik",
+  "display_name": "PDFik",
+  "version": "0.1.0",
+  "description": "Turn URL/HTML/Markdown into PDFs, screenshots and Factur-X e-invoices with PDFik.",
+  "long_description": "Ask your assistant to turn a web page, HTML or Markdown into a PDF or a screenshot, or to build a Factur-X / ZUGFeRD e-invoice from invoice XML. Files are saved in a folder on your computer; the assistant gets the path. Needs a PDFik API key (every plan, Free included).",
+  "author": {
+    "name": "PDFik",
+    "email": "support@pdfik.net",
+    "url": "https://pdfik.net"
+  },
+  "homepage": "https://pdfik.net",
+  "documentation": "https://docs.pdfik.net/integrations/mcp",
+  "support": "https://github.com/pdfik/pdfik-mcp/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pdfik/pdfik-mcp"
+  },
+  "icon": "icon.png",
+  "license": "MIT",
+  "keywords": [
+    "pdf",
+    "html-to-pdf",
+    "url-to-pdf",
+    "markdown",
+    "screenshot",
+    "factur-x",
+    "zugferd",
+    "e-invoice"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/dist/index.js"
+      ],
+      "env": {
+        "PDFIK_API_KEY": "${user_config.api_key}",
+        "PDFIK_OUTPUT_DIR": "${user_config.output_dir}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "url_to_pdf",
+      "description": "Render a public web page to PDF"
+    },
+    {
+      "name": "html_to_pdf",
+      "description": "Render HTML markup to PDF"
+    },
+    {
+      "name": "markdown_to_pdf",
+      "description": "Render Markdown to PDF"
+    },
+    {
+      "name": "url_to_image",
+      "description": "Capture a web page as PNG/JPEG"
+    },
+    {
+      "name": "html_to_image",
+      "description": "Capture HTML markup as PNG/JPEG"
+    },
+    {
+      "name": "einvoice_to_pdf",
+      "description": "Build a Factur-X / ZUGFeRD e-invoice PDF from CII XML"
+    },
+    {
+      "name": "get_job",
+      "description": "Get the status of a job"
+    },
+    {
+      "name": "download_job",
+      "description": "Save the output of a finished job"
+    },
+    {
+      "name": "get_account",
+      "description": "Plan, quota window, usage and limits of the API key"
+    }
+  ],
+  "user_config": {
+    "api_key": {
+      "type": "string",
+      "title": "PDFik API key",
+      "description": "Create a key at https://pdfik.net/dashboard/api-keys",
+      "sensitive": true,
+      "required": true
+    },
+    "output_dir": {
+      "type": "directory",
+      "title": "Output folder",
+      "description": "Where PDFs and screenshots are saved",
+      "required": false,
+      "default": "${HOME}/Downloads/PDFik"
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=22.0.0"
+    }
+  },
+  "privacy_policies": [
+    "https://docs.pdfik.net/legal/privacy"
+  ]
+}

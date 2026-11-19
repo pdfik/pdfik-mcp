@@ -1,0 +1,15 @@
+{
+  "name": "pdfik",
+  "owner": {
+    "name": "PDFik",
+    "email": "support@pdfik.net"
+  },
+  "plugins": [
+    {
+      "name": "pdfik",
+      "source": "./plugin",
+      "description": "Turn URL/HTML/Markdown into PDFs, screenshots and Factur-X e-invoices with PDFik.",
+      "version": "0.1.0"
+    }
+  ]
+}

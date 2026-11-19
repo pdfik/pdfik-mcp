@@ -1,0 +1,25 @@
+{
+  "name": "pdfik",
+  "version": "0.1.0",
+  "description": "Turn URL/HTML/Markdown into PDFs, screenshots and Factur-X e-invoices with PDFik.",
+  "author": {
+    "name": "PDFik",
+    "email": "support@pdfik.net",
+    "url": "https://pdfik.net"
+  },
+  "homepage": "https://docs.pdfik.net/integrations/mcp",
+  "repository": "https://github.com/pdfik/pdfik-mcp",
+  "license": "MIT",
+  "keywords": [
+    "pdf",
+    "screenshot",
+    "factur-x",
+    "e-invoice"
+  ],
+  "userConfig": {
+    "api_key": {
+      "description": "PDFik API key (https://pdfik.net/dashboard/api-keys)",
+      "sensitive": true
+    }
+  }
+}

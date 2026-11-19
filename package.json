@@ -1,0 +1,55 @@
+{
+  "name": "@pdfik/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for PDFik: turn URL/HTML/Markdown into PDFs, screenshots and Factur-X e-invoices from Claude, Cursor and other MCP clients.",
+  "mcpName": "io.github.pdfik/pdfik-mcp",
+  "license": "MIT",
+  "author": "PDFik <support@pdfik.net>",
+  "homepage": "https://docs.pdfik.net/integrations/mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pdfik/pdfik-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pdfik/pdfik-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "pdf",
+    "html-to-pdf",
+    "url-to-pdf",
+    "screenshot",
+    "factur-x",
+    "pdfik"
+  ],
+  "type": "module",
+  "bin": {
+    "pdfik-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "prepublishOnly": "npm run build && node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.4.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.3",
+    "typescript": "5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
